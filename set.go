@@ -8,24 +8,24 @@ import (
 
 // Set is an integer set
 type Set struct {
-	m map[int]struct{}
+	m map[int32]struct{}
 }
 
 // NewSet returns a pointer to an empty set
 func NewSet() Set {
-	m := make(map[int]struct{})
+	m := make(map[int32]struct{})
 	return Set{m}
 }
 
 // NewSetInit returns a pointer to a set with the passed integer
-func NewSetInit(i int) (ns Set) {
+func NewSetInit(i int32) (ns Set) {
 	ns = NewSet()
 	ns.add(i)
 	return ns
 }
 
 // Add inserts the given integer into the set if it does not already exist
-func (s Set) Add(i int) {
+func (s Set) Add(i int32) {
 	if s.Contains(i) {
 		return
 	}
@@ -33,7 +33,7 @@ func (s Set) Add(i int) {
 }
 
 // Remove deletes the given integer from the set if it exists
-func (s Set) Remove(i int) {
+func (s Set) Remove(i int32) {
 	if !s.Contains(i) {
 		return
 	}
@@ -63,7 +63,7 @@ func (s Set) Copy() (ns Set) {
 }
 
 // Range executes the ranging function for each element
-func (s Set) Range(f func(int) bool) {
+func (s Set) Range(f func(int32) bool) {
 	for i := range s.m {
 		if !f(i) {
 			break
@@ -72,7 +72,7 @@ func (s Set) Range(f func(int) bool) {
 }
 
 // Contains returns whether the set contains the integer
-func (s Set) Contains(i int) bool {
+func (s Set) Contains(i int32) bool {
 	_, ok := s.m[i]
 	return ok
 }
@@ -83,8 +83,8 @@ func (s Set) IsEmpty() bool {
 }
 
 // Size returns the number of items in the set
-func (s Set) Size() int {
-	return len(s.m)
+func (s Set) Size() int32 {
+	return int32(len(s.m))
 }
 
 // Equals returns whether the sets are equal
@@ -93,7 +93,7 @@ func (s Set) Equals(os Set) bool {
 		return false
 	}
 	equal := true
-	s.Range(func(i int) bool {
+	s.Range(func(i int32) bool {
 		if !os.Contains(i) {
 			equal = false
 			return false
@@ -103,23 +103,29 @@ func (s Set) Equals(os Set) bool {
 	return equal
 }
 
+type int32s []int32
+
+func (a int32s) Len() int           { return len(a) }
+func (a int32s) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a int32s) Less(i, j int) bool { return a[i] < a[j] }
+
 // Print returns a string representation of the set
 func (s Set) Print() string {
-	ints := make([]int, 0)
+	ints := make([]int32, 0)
 	for i := range s.m {
 		ints = append(ints, i)
 	}
-	sort.Ints(ints)
+	sort.Sort(int32s(ints))
 	var sb strings.Builder
 	sb.WriteString("{ ")
 	for _, i := range ints {
-		sb.WriteString(strconv.Itoa(i))
+		sb.WriteString(strconv.Itoa(int(i)))
 		sb.WriteRune(' ')
 	}
 	sb.WriteString("}")
 	return sb.String()
 }
 
-func (s Set) add(i int) {
+func (s Set) add(i int32) {
 	s.m[i] = struct{}{}
 }
